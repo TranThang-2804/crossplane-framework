@@ -1,1 +1,16 @@
-This is the taskfile for common script
+version: '3'
+
+tasks:
+  install-crossplane:
+    desc: Install Crossplane to your current cluster context
+    cmds:
+      - |
+        helm repo add crossplane-stable https://charts.crossplane.io/stable && \
+        helm repo update
+      - |
+        kubectl get namespace crossplane-system || \
+        kubectl create namespace crossplane-system
+      - |
+        helm install crossplane crossplane-stable/crossplane \
+        --dry-run --debug \
+        --namespace crossplane-system
