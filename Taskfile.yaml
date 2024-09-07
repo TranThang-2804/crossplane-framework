@@ -11,6 +11,15 @@ tasks:
         kubectl get namespace crossplane-system || \
         kubectl create namespace crossplane-system
       - |
-        helm install crossplane crossplane-stable/crossplane \
-        --dry-run --debug \
-        --namespace crossplane-system
+        helm install crossplane \
+        crossplane-stable/crossplane \
+        --namespace crossplane-system \
+        --create-namespace
+  install-k3d:
+    desc: Instal k3d
+    cmds:
+      - wget -q -O - https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash
+  create-k3d-cluster:
+    desc: Create k3d cluster
+    cmds:
+      - k3d cluster create
