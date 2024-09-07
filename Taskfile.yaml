@@ -23,3 +23,7 @@ tasks:
     desc: Create k3d cluster
     cmds:
       - k3d cluster create
+  install-manifest:
+    desc: Install all manifest file in manifests directory
+    cmds:
+      - kubectl apply -f manifest/**.yaml
