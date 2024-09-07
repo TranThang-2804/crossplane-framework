@@ -3,6 +3,7 @@ version: '3'
 tasks:
   install-crossplane:
     desc: Install Crossplane to your current cluster context
+    silent: true
     cmds:
       - |
         helm repo add crossplane-stable https://charts.crossplane.io/stable && \
@@ -17,13 +18,31 @@ tasks:
         --create-namespace
   install-k3d:
     desc: Instal k3d
+    silent: true
     cmds:
       - wget -q -O - https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash
   create-k3d-cluster:
     desc: Create k3d cluster
+    silent: true
     cmds:
       - k3d cluster create
-  install-manifest:
-    desc: Install all manifest file in manifests directory
+  setup:
+    desc: Install configuration from helm
+    silent: true
+    vars:
+      RELEASE_NAME: "crossplane-component"
+      NAMESPACE: "default"
+      CHART_PATH: "./helm/crossplane-components"
+      AWS_SECRET:
+        sh: cat .env | base64
     cmds:
-      - kubectl apply -f manifest/**.yaml
+      - |
+        if helm status {{.RELEASE_NAME}} -n {{.NAMESPACE}} > /dev/null 2>&1; then
+          echo "Helm release '{{.RELEASE_NAME}}' already exists in namespace '{{.NAMESPACE}}'."
+          helm upgrade {{.RELEASE_NAME}} {{.CHART_PATH}} -n {{.NAMESPACE}} \
+            --set awsSecret={{.AWS_SECRET}}
+        else
+          echo "Helm release {{.RELEASE_NAME}}' does not exist. Installing..."
+          helm install {{.RELEASE_NAME}} {{.CHART_PATH}} -n {{.NAMESPACE}} \
+            --set awsSecret={{.AWS_SECRET}}
+        fi
