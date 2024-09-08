@@ -26,7 +26,7 @@ tasks:
         --namespace crossplane-system \
         --create-namespace
       - echo "sleeping 180 secs, waiting for crossplane to install required CRDs"
-      - sleep 0
+      - sleep 180
     run: once
   install-k3d:
     desc: Instal k3d
