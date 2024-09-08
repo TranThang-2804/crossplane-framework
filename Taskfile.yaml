@@ -16,6 +16,9 @@ tasks:
         crossplane-stable/crossplane \
         --namespace crossplane-system \
         --create-namespace
+      - echo "sleeping 180 secs, waiting for crossplane to install required CRDs"
+      - sleep 180
+    run: once
   install-k3d:
     desc: Instal k3d
     silent: true
@@ -35,6 +38,8 @@ tasks:
       CHART_PATH: "./helm/crossplane-components"
       AWS_SECRET:
         sh: cat .env | base64
+    deps:
+      - install-crossplane 
     cmds:
       - |
         if helm status {{.RELEASE_NAME}} -n {{.NAMESPACE}} > /dev/null 2>&1; then
