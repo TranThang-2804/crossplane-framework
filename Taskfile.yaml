@@ -4,6 +4,10 @@ tasks:
   install-crossplane:
     desc: Install Crossplane to your current cluster context
     silent: true
+    vars:
+      RELEASE_NAME: "crossplane"
+      NAMESPACE: "crossplane-system"
+      CHART_PATH: "crossplane-stable/crossplane"
     cmds:
       - |
         helm repo add crossplane-stable https://charts.crossplane.io/stable && \
@@ -12,12 +16,17 @@ tasks:
         kubectl get namespace crossplane-system || \
         kubectl create namespace crossplane-system
       - |
-        helm install crossplane \
+        if helm status {{.RELEASE_NAME}} -n {{.NAMESPACE}} > /dev/null 2>&1; then
+          ACTION=upgrade
+        else
+          ACTION=install
+        fi
+        helm $ACTION crossplane \
         crossplane-stable/crossplane \
         --namespace crossplane-system \
         --create-namespace
       - echo "sleeping 180 secs, waiting for crossplane to install required CRDs"
-      - sleep 180
+      - sleep 0
     run: once
   install-k3d:
     desc: Instal k3d
